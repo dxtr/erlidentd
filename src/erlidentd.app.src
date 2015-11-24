@@ -7,5 +7,9 @@
   {applications, [kernel,
 		  stdlib,
 		  crypto]},
-  {env, []}
+  {env, []},
+  {mod, {'erlidentd_app', []}},
+  {contributors, ["dxtr"]},
+  {licenses, ["ISC"]},
+  {links, ["https://github.com/dxtr/erlidentd"]}
  ]}.

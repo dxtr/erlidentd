@@ -26,8 +26,7 @@ stop([]) -> gen_server:call([?MODULE], stop).
 init([Port, Module]) ->
     io:format("Initializing listener..~n"),
     process_flag(trap_exit, true),
-    Opts = [binary, {packet, 2}, {reuseaddr, true},
-            {keepalive, true}, {backlog, 30}, {active, false}],
+    Opts = [binary, {reuseaddr, true}, {keepalive, true}, {backlog, 30}, {active, false}],
     case gen_tcp:listen(Port, Opts) of
 	{ok, LSock} ->
 	    %%Create first accepting process

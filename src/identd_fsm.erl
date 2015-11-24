@@ -21,7 +21,8 @@
 	  port       % client port
 	 }).
  
--define(TIMEOUT, 120000).
+-define(TIMEOUT, 10000).
+-define(IDENT_PATTERN, re:compile("^\s*([\d]{1,5})\s*,\s*([\d]{1,5})\s*$", [])).
 
 % To get hexadecimals from binary data: lists:flatten(io_lib:format("~40.16.0b", [data])).
  
@@ -41,8 +42,7 @@ init(_) ->
 'WAIT_FOR_SOCKET'({socket_ready, Socket}, State) when is_port(Socket) ->
     % Now we own the socket
     io:format("~p Socket is ready~n", [self()]),
-    inet:setopts(Socket, [{active, once}, {packet, 2}, binary]),
-    inet:setopts(Socket, [{active, once}]),
+    inet:setopts(Socket, [{active, once}, binary]),
     {ok, {IP, Port}} = inet:peername(Socket),
     io:format("~p Connection from ~p:~p~n", [self(), IP, Port]),
     io:format("State: ~p~n", [State#state{socket=Socket, addr=IP}]),
@@ -54,8 +54,8 @@ init(_) ->
  
 'WAIT_FOR_DATA'({data, Data}, #state{socket=S} = State) ->
     io:format("Got some data! ~p~n", [Data]),
+    handle_data(Data),
     ok = gen_tcp:send(S, Data),
-    io:format("Sent some data!~n"),
     {next_state, 'WAIT_FOR_DATA', State, ?TIMEOUT};
 'WAIT_FOR_DATA'(timeout, State) ->
     error_logger:error_msg("~p Client connection timeout - closing.~n", [self()]),
@@ -63,7 +63,36 @@ init(_) ->
 'WAIT_FOR_DATA'(Data, State) ->
     io:format("~p Ignoring data: ~p~n", [self(), Data]),
     {next_state, 'WAIT_FOR_DATA', State, ?TIMEOUT}.
- 
+
+handle_data(Data) ->
+    case re:run(Data, IDENT_PATTERN, []) of
+	{match, [_Fullmatch, {LoportStart, LoportLength}, {HiportStart, HiportLength}]} ->
+	    Loport = str_to_port(string:substr(Data, LoportStart, LoportLength)),
+	    Hiport = str_to_port(string:substr(Data, HiportStart, HiportLength)),
+	    generate_response(Hiport, Loport);
+	_ -> fail
+    end.
+
+str_to_port(Port) ->
+    case string:to_integer(Port) of
+	{error, _} -> 0;
+	{Res, _} -> Res
+    end.
+
+generate_randomness() ->
+    "abcdef".
+
+generate_response(Loport, Hiport) when is_integer(Loport) and
+				       Loport > 0 and
+				       is_integer(Hiport) and
+				       Hiport < 65536 ->
+    "Correct!";
+generate_response(Loport, Hiport) when is_integer(Loport) and
+				       is_integer(Hiport) ->
+    "Almost correct";
+generate_response(Loport, Hiport) ->
+    "fail again".
+
 handle_event(Event, StateName, StateData) ->
     io:format("~p Event ~p happened~n", [self(), Event]),
     {stop, {StateName, undefined_event, Event}, StateData}.

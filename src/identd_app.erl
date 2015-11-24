@@ -3,7 +3,7 @@
 -export([start/0, start/2, stop/1, start_client/0, init/1]).
 -define(MAX_RESTART,  5).
 -define(MAX_TIME,    60).
--define(DEF_PORT, 12345).
+-define(DEF_PORT,   113).
 
 start(_Type, _Args) ->
     LPort = get_app_env(listen_port, ?DEF_PORT),

@@ -1,4 +1,4 @@
--module('identd_app').
+-module(erlidentd_app).
 -behaviour(application).
 -export([start/0, start/2, stop/1, start_client/0, init/1]).
 -define(MAX_RESTART,  5).
@@ -7,7 +7,7 @@
 
 start(_Type, _Args) ->
     LPort = get_app_env(listen_port, ?DEF_PORT),
-    supervisor:start_link({local, ?MODULE}, ?MODULE, [LPort, identd_fsm]).
+    supervisor:start_link({local, ?MODULE}, ?MODULE, [LPort, erlidentd_fsm]).
 
 start() ->
     start([], []).
@@ -15,23 +15,23 @@ start() ->
 stop(_State) -> ok.
 
 start_client() ->
-    supervisor:start_child(identd_fsm_sup, []).
+    supervisor:start_child(erlidentd_fsm_sup, []).
 
 init([Port, Module]) ->
     {ok,
         {_SupFlags = {one_for_one, ?MAX_RESTART, ?MAX_TIME},
             [
               % TCP Listener
-              {   identd_listener_sup,                          % Id       = internal id
-                  {identd_listener,start_link,[Port,Module]}, % StartFun = {M, F, A}
+              {   erlidentd_listener_sup,                          % Id       = internal id
+                  {erlidentd_listener,start_link,[Port,Module]}, % StartFun = {M, F, A}
                   permanent,                               % Restart  = permanent | transient | temporary
                   2000,                                    % Shutdown = brutal_kill | int() >= 0 | infinity
                   worker,                                  % Type     = worker | supervisor
-                  [identd_listener]                           % Modules  = [Module] | dynamic
+                  [erlidentd_listener]                           % Modules  = [Module] | dynamic
               },
               % Client instance supervisor
-              {   identd_fsm_sup,
-                  {supervisor,start_link,[{local, identd_fsm_sup}, ?MODULE, [Module]]},
+              {   erlidentd_fsm_sup,
+                  {supervisor,start_link,[{local, erlidentd_fsm_sup}, ?MODULE, [Module]]},
                   permanent,                               % Restart  = permanent | transient | temporary
                   infinity,                                % Shutdown = brutal_kill | int() >= 0 | infinity
                   supervisor,                              % Type     = worker | supervisor

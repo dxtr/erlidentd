@@ -3,7 +3,7 @@
 %% @end
 %%%-------------------------------------------------------------------
 
--module('identd_sup').
+-module(erlidentd_sup).
 -author('kim@dxtr.im').
 
 -behaviour(supervisor).
@@ -24,10 +24,10 @@ start_link() ->
 init([]) ->
     {ok, {{one_for_one, 0, 15},
        [{serv,
-	 {identd_server, start_link, []},
+	 {erlidentd_server, start_link, []},
 	 5000,
 	 worker,
-	 [identd_fsm]}]}}.
+	 [erlidentd_fsm]}]}}.
 
 %%====================================================================
 %% Internal functions

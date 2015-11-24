@@ -1,0 +1,15 @@
+%% -*- mode: erlang;erlang-indent-level: 4;indent-tabs-mode: nil -*-
+{application, erlidentd,
+ [{description, "A simple identd that simply returns random hexadecimals as the ident"},
+  {vsn, "git"},
+  {registered, []},
+  {mod, {erlidentd_app, []}},
+  {applications, [kernel,
+		  stdlib,
+		  crypto]},
+  {env, []},
+  {modules, [erlidentd_app,erlidentd_fsm,erlidentd_listener,erlidentd_sup]},
+  {contributors, [dxtr]},
+  {licenses, [ISC]},
+  {links, []}
+ ]}.

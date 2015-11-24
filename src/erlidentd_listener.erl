@@ -1,4 +1,4 @@
--module(identd_listener).
+-module(erlidentd_listener).
 -author('kim@dxtr.im').
 
 -behaviour(gen_server).
@@ -17,7 +17,7 @@ start_link(Port, Module) when is_integer(Port),
 			      is_atom(Module) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [Port, Module], []).
 
-start_link(Port) -> start_link(Port, identd_fsm).
+start_link(Port) -> start_link(Port, erlidentd_fsm).
 
 start_link() -> start_link(1234).
 
@@ -64,7 +64,7 @@ handle_info({inet_async, ListSock, Ref, {ok, CliSocket}},
 	
         %% New client connected - spawn a new process using the simple_one_for_one
         %% supervisor.
-        {ok, Pid} = identd_app:start_client(),
+        {ok, Pid} = erlidentd_app:start_client(),
         gen_tcp:controlling_process(CliSocket, Pid),
         %% Instruct the new FSM that it owns the socket.
         Module:set_socket(Pid, CliSocket),

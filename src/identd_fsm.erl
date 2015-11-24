@@ -53,7 +53,7 @@ init(_) ->
     {next_state, 'WAIT_FOR_DATA', State, ?TIMEOUT};
 'WAIT_FOR_DATA'(timeout, State) ->
     {stop, normal, State};
-'WAIT_FOR_DATA'(Data, State) ->
+'WAIT_FOR_DATA'(_Data, State) ->
     {next_state, 'WAIT_FOR_DATA', State, ?TIMEOUT}.
 
 generate_randomness() ->
@@ -102,7 +102,7 @@ str_to_port(Port) ->
 handle_event(Event, StateName, StateData) ->
     {stop, {StateName, undefined_event, Event}, StateData}.
  
-handle_sync_event(Event, From, StateName, StateData) ->
+handle_sync_event(Event, _From, StateName, StateData) ->
     {stop, {StateName, undefined_event, Event}, StateData}.
  
 handle_info({tcp, Socket, Bin}, StateName, #state{socket=Socket} = StateData) ->

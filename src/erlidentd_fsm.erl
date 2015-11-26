@@ -57,7 +57,7 @@ init(_) ->
     {next_state, 'WAIT_FOR_DATA', State, ?TIMEOUT}.
 
 generate_randomness() ->
-    lists:flatten([io_lib:format("~2.16.0b", [byte]) || byte <- binary_to_list(crypto:strong_rand_bytes(4))]).
+    lists:flatten([io_lib:format("~2.16.0b", [Byte]) || Byte <- binary_to_list(crypto:strong_rand_bytes(4))]).
 
 generate_response(Serverport, Clientport) when is_integer(Serverport),
 					       Serverport > 0,
@@ -86,7 +86,6 @@ str_to_port(Port) ->
 	{error, _} -> 0;
 	{Res, _} -> Res
     end.
-
 
 handle_event(Event, StateName, StateData) ->
     {stop, {StateName, undefined_event, Event}, StateData}.

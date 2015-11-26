@@ -63,7 +63,7 @@ generate_response(Serverport, Clientport) when is_integer(Serverport),
 					       Serverport > 0,
 					       is_integer(Clientport),
 					       Clientport < 65536 ->
-    io_lib:format("~.10b , ~.10b : USERID : UNIX : ~p", [Serverport, Clientport, generate_randomness()]);
+    io_lib:format("~.10b , ~.10b : USERID : UNIX : ~s", [Serverport, Clientport, generate_randomness()]);
 generate_response(Serverport, Clientport) when is_integer(Serverport),
 					       is_integer(Clientport) ->
     io_lib:format("~.10b , ~.10b : ERROR : INVALID-PORT", [Serverport, Clientport]);

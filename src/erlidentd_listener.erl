@@ -13,20 +13,6 @@
 	  module          % FSM handling module
 	 }).
 
-
-% start_link/0
-%start_link() -> start_link(1130).
-
-%start_link([_,_,_]) ->
-%    io:format("start_link/1~n").
-
-% start_link/2
-%start_link({ok, IP}, Port) when is_integer(Port) ->
-%    start_link(IP, Port, erlidentd_fsm);
-%start_link(_IP, _Port) ->
-%    io:format("Invalid data passed!~n").
-
-
 % start_link/3
 start_link({ok, IP}, Port, Name, Module) when is_integer(Port),
 					is_atom(Module) ->

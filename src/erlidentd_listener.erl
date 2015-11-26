@@ -3,7 +3,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/0, start_link/1, start_link/2, stop/1]).
+-export([start_link/4, stop/1]).
 -export([init/1, handle_call/3, handle_cast/2,
 	 handle_info/2, code_change/3, terminate/2]).
 
@@ -13,20 +13,44 @@
 	  module          % FSM handling module
 	 }).
 
-start_link(Port, Module) when is_integer(Port),
+
+% start_link/0
+%start_link() -> start_link(1130).
+
+%start_link([_,_,_]) ->
+%    io:format("start_link/1~n").
+
+% start_link/2
+%start_link({ok, IP}, Port) when is_integer(Port) ->
+%    start_link(IP, Port, erlidentd_fsm);
+%start_link(_IP, _Port) ->
+%    io:format("Invalid data passed!~n").
+
+
+% start_link/3
+start_link({ok, IP}, Port, Name, Module) when is_integer(Port),
+					is_atom(Module) ->
+    start_link(IP, Port, Name, Module);
+start_link(IP, Port, Name, Module) when is_integer(Port),
 			      is_atom(Module) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [Port, Module], []).
+    gen_server:start_link({local, Name}, ?MODULE, [IP, Port, Module], []);
+start_link(_IP, _Port, _Name, _Module) ->
+    % What to do here? Port isn't an integer and Module is not an atom
+    io:format("Invalid data passed!~n").
 
-start_link(Port) -> start_link(Port, erlidentd_fsm).
-
-start_link() -> start_link(1234).
 
 stop([]) -> gen_server:call([?MODULE], stop).
 
-init([Port, Module]) ->
+init([IP, Port, Module]) ->
     io:format("Initializing listener..~n"),
     process_flag(trap_exit, true),
-    Opts = [binary, {reuseaddr, true}, {keepalive, true}, {backlog, 30}, {active, false}],
+    Opts = [binary,
+	    {reuseaddr, true},
+	    {keepalive, true},
+	    {backlog, 30},
+	    {active, false},
+	    {ip, IP}
+	   ],
     case gen_tcp:listen(Port, Opts) of
 	{ok, LSock} ->
 	    %%Create first accepting process

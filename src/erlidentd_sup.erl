@@ -23,11 +23,11 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
     {ok, {{one_for_one, 0, 15},
-       [{serv,
-	 {erlidentd_server, start_link, []},
-	 5000,
-	 worker,
-	 [erlidentd_fsm]}]}}.
+	  [{serv,
+	    {erlidentd_server, start_link, []},
+	    5000,
+	    worker,
+	    [erlidentd_fsm]}]}}.
 
 %%====================================================================
 %% Internal functions

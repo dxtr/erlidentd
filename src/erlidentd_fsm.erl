@@ -48,8 +48,8 @@ init(_) ->
  
 'WAIT_FOR_DATA'({data, Data}, #state{socket=S} = State) ->
     Response = handle_data(binary_to_list(Data)),
-    io:format("Response: ~p~n", [Response]),
     ok = gen_tcp:send(S, [Response, 13, 10, 0]),
+    gen_tcp:close(S),
     {next_state, 'WAIT_FOR_DATA', State, ?TIMEOUT};
 'WAIT_FOR_DATA'(timeout, State) ->
     {stop, normal, State};
@@ -57,27 +57,16 @@ init(_) ->
     {next_state, 'WAIT_FOR_DATA', State, ?TIMEOUT}.
 
 generate_randomness() ->
-    lists:flatten(
-      lists:foldl(
-	fun(Item, Accum) ->
-		lists:append(
-		  io_lib:format("~.16.0b",
-				[if Item < 0 -> Item * -2;
-				    true -> Item
-				 end]),
-		  Accum)
-	end,
-	"",
-	binary_to_list(crypto:strong_rand_bytes(4)))).
+    lists:flatten([io_lib:format("~2.16.0b", [byte]) || byte <- binary_to_list(crypto:strong_rand_bytes(4))]).
 
 generate_response(Serverport, Clientport) when is_integer(Serverport),
 					       Serverport > 0,
 					       is_integer(Clientport),
 					       Clientport < 65536 ->
-    io_lib:format("~p , ~p : USERID : UNIX : ~p", [Serverport, Clientport, generate_randomness()]);
+    io_lib:format("~.10b , ~.10b : USERID : UNIX : ~p", [Serverport, Clientport, generate_randomness()]);
 generate_response(Serverport, Clientport) when is_integer(Serverport),
 					       is_integer(Clientport) ->
-    io_lib:format("~p , ~p : ERROR : INVALID-PORT", [Serverport, Clientport]);
+    io_lib:format("~.10b , ~.10b : ERROR : INVALID-PORT", [Serverport, Clientport]);
 generate_response(_Serverport, _Clientport) ->
     generate_response(0,0).
 

@@ -23,14 +23,14 @@ init([Port, Module]) ->
      {_SupFlags = {one_for_one, ?MAX_RESTART, ?MAX_TIME},
       [
        { erlidentd_listener4_sup,                          % Id       = internal id
-	 {erlidentd_listener,start_link,[{0,0,0,0}, Port, listenerv4, Module]}, % StartFun = {M, F, A}
+	 {erlidentd_listener,start_link,[inet:parse_address("127.0.0.1"), Port, listenerv4, Module]}, % StartFun = {M, F, A}
 	 permanent,                               % Restart  = permanent | transient | temporary
 	 2000,                                    % Shutdown = brutal_kill | int() >= 0 | infinity
 	 worker,                                  % Type     = worker | supervisor
 	 [erlidentd_listener]                           % Modules  = [Module] | dynamic
        },
        { erlidentd_listener6_sup,
-	 {erlidentd_listener, start_link, [inet:parse_address("::"), Port, listenerv6, Module]},
+	 {erlidentd_listener, start_link, [inet:parse_address("::1"), Port, listenerv6, Module]},
 	 permanent,
 	 2000,
 	 worker,

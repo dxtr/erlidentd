@@ -23,7 +23,7 @@
  
 -define(TIMEOUT, 10000).
 -define(IDENT_PATTERN, "^\s*([0-9]{1,5})\s*,\s*([0-9]{1,5})\s*$").
--define(IDENT_COMPILED_PATTERN, re:compile(?IDENT_PATTERN, [])).
+-define(IDENT_COMPILED_PATTERN, re:compile(?IDENT_PATTERN, [{newline, anycrlf}])).
 
 % To get hexadecimals from binary data: lists:flatten(io_lib:format("~40.16.0b", [data])).
  
